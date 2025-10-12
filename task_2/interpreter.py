@@ -62,19 +62,19 @@ class Lexer:
 
             if self.current_char.isdigit():
                 return Token(TokenType.INTEGER, self.integer())
-            
+
             if self.current_char == "*":
                 self.advance()
                 return Token(TokenType.MUL, "*")
-            
+
             if self.current_char == "/":
                 self.advance()
                 return Token(TokenType.DIV, "/")
-            
+
             if self.current_char == "(":
                 self.advance()
                 return Token(TokenType.LPAREN, "(")
-            
+
             if self.current_char == ")":
                 self.advance()
                 return Token(TokenType.RPAREN, ")")
@@ -126,7 +126,7 @@ class Parser:
             self.current_token = self.lexer.get_next_token()
         else:
             self.error()
-    
+
     def factor(self):
         """Парсер для 'factor' правил граматики. У нашому випадку - це цілі числа або вирази в дужках."""
         token = self.current_token
