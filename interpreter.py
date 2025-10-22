@@ -14,7 +14,7 @@ class TokenType:
     DIV = "DIV"
     LPAREN = "LPAREN"
     RPAREN = "RPAREN"
-    EOF = "EOF"  # Означає кінець вхідного рядка
+    EOF = "EOF"  # Indicates end of input string
 
 
 class Token:
@@ -33,20 +33,20 @@ class Lexer:
         self.current_char = self.text[self.pos]
 
     def advance(self):
-        """Переміщуємо 'вказівник' на наступний символ вхідного рядка"""
+        """Move the 'pointer' to the next character in the input string"""
         self.pos += 1
         if self.pos > len(self.text) - 1:
-            self.current_char = None  # Означає кінець введення
+            self.current_char = None  # Indicates end of input
         else:
             self.current_char = self.text[self.pos]
 
     def skip_whitespace(self):
-        """Пропускаємо пробільні символи."""
+        """Skip whitespace characters."""
         while self.current_char is not None and self.current_char.isspace():
             self.advance()
 
     def integer(self):
-        """Повертаємо ціле число, зібране з послідовності цифр."""
+        """Return an integer collected from a sequence of digits."""
         result = ""
         while self.current_char is not None and self.current_char.isdigit():
             result += self.current_char
@@ -54,7 +54,7 @@ class Lexer:
         return int(result)
 
     def get_next_token(self):
-        """Лексичний аналізатор, що розбиває вхідний рядок на токени."""
+        """Lexical analyzer that breaks the input string into tokens."""
         while self.current_char is not None:
             if self.current_char.isspace():
                 self.skip_whitespace()
@@ -87,7 +87,7 @@ class Lexer:
                 self.advance()
                 return Token(TokenType.MINUS, "-")
 
-            raise LexicalError("Помилка лексичного аналізу")
+            raise LexicalError("Lexical analysis error")
 
         return Token(TokenType.EOF, None)
 
@@ -115,12 +115,12 @@ class Parser:
         self.current_token = self.lexer.get_next_token()
 
     def error(self):
-        raise ParsingError("Помилка синтаксичного аналізу")
+        raise ParsingError("Syntax analysis error")
 
     def eat(self, token_type):
         """
-        Порівнюємо поточний токен з очікуваним токеном і, якщо вони збігаються,
-        'поглинаємо' його і переходимо до наступного токена.
+        Compare the current token with the expected token and, if they match,
+        'consume' it and move to the next token.
         """
         if self.current_token.type == token_type:
             self.current_token = self.lexer.get_next_token()
@@ -128,7 +128,7 @@ class Parser:
             self.error()
 
     def factor(self):
-        """Парсер для 'factor' правил граматики. У нашому випадку - це цілі числа або вирази в дужках."""
+        """Parser for 'factor' grammar rules. In our case - these are integers or expressions in parentheses."""
         token = self.current_token
         if token.type == TokenType.INTEGER:
             self.eat(TokenType.INTEGER)
@@ -141,7 +141,7 @@ class Parser:
         self.error()
 
     def term(self):
-        """Парсер для 'term' правил граматики. Обробляє множення та ділення."""
+        """Parser for 'term' grammar rules. Handles multiplication and division."""
         node = self.factor()
 
         while self.current_token.type in (TokenType.MUL, TokenType.DIV):
@@ -156,7 +156,7 @@ class Parser:
         return node
 
     def expr(self):
-        """Парсер для арифметичних виразів."""
+        """Parser for arithmetic expressions."""
         node = self.term()
 
         while self.current_token.type in (TokenType.PLUS, TokenType.MINUS):
@@ -213,15 +213,15 @@ class Interpreter:
         return visitor(node)
 
     def generic_visit(self, node):
-        raise Exception(f"Немає методу visit_{type(node).__name__}")
+        raise Exception(f"No method visit_{type(node).__name__}")
 
 
 def main():
     while True:
         try:
-            text = input('Введіть вираз (або "exit" для виходу): ')
+            text = input('Enter expression (or "exit" to quit): ')
             if text.lower() == "exit":
-                print("Вихід із програми.")
+                print("Exiting the program.")
                 break
             lexer = Lexer(text)
             parser = Parser(lexer)
